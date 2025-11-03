@@ -1,4 +1,4 @@
-FROM ghcr.io/distroless/alpine-base
+FROM alpine:edge
 
 LABEL com.github.containers.toolbox="true" \
       name="video-toolbox" \
