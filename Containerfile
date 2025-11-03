@@ -13,5 +13,3 @@ RUN apk update && \
     apk upgrade && \
     cat /extra-packages | xargs apk add
 RUN rm /extra-packages
-
-#ENTRYPOINT ["yt-dlp"]
