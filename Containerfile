@@ -1,8 +1,8 @@
-FROM alpine:edge
+FROM alpine:3.24
 
 LABEL com.github.containers.toolbox="true" \
       name="video-toolbox" \
-      version="edge" \
+      version="3.24" \
       usage="This image is meant to be used with the toolbox command" \
       summary="Alpine toolbox containers with video tools" \
       maintainer="Pedro Caetano <pedrompcaetano@gmail.com>"
