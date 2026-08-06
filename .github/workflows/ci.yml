@@ -1,0 +1,61 @@
+name: CI Build with Podman
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Build container image with Buildah
+        id: buildah-build
+        uses: redhat-actions/buildah-build@v3
+        with:
+          image: video-tools
+          tags: latest
+          containerfiles: |
+            ./Containerfile
+      - name: Verify image creation
+
+      - name: Save Podman image to archive
+        run: |
+          podman save --format docker-archive -o video-tools.tar localhost/video-tools:latest
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: docker-archive:video-tools.tar
+          format: cyclonedx-json
+          output-file: sbom.json
+
+      - name: Scan SBOM for Vulnerabilities (Grype)
+        id: grype-scan
+        uses: anchore/scan-action@v7
+        with:
+          sbom: "sbom.json"
+          fail-build: false  # Allow SARIF upload before failing
+          severity-cutoff: high
+
+      - name: Upload SARIF Report to GitHub Security
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: ${{ steps.grype-scan.outputs.sarif }}
+
+      - name: Upload SBOM Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: video-tools-sbom
+          path: sbom.json
