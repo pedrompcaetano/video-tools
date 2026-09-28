@@ -1,8 +1,13 @@
 version: 2
 updates:
+  # Monitor GitHub Actions (checkout, sbom-action, scan-action, etc.)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Monitor Dockerfile base images (e.g., alpine:3.20)
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "daily"
-    manifest-files:
-      - "Containerfile"
+      interval: "weekly"
